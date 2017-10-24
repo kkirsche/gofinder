@@ -39,6 +39,7 @@ includes the page title, link URL's, inline and external scripts, as well as
 comments. The goal of this is to simplify security auditing of sites by being
 able to ignore some of the standard boilerplate nodes and focus on the ones
 that are commonly of interest.`,
+	Args: cobra.MinimumNArgs(1),
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
@@ -52,7 +53,7 @@ that are commonly of interest.`,
 		for _, arg := range args {
 			resp, err := client.Get(arg)
 			if err != nil {
-				return
+				continue
 			}
 
 			client.Find(resp)
@@ -72,6 +73,24 @@ func Execute() {
 func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
+	RootCmd.SetUsageTemplate(`Usage:{{if .Runnable}}
+  {{.UseLine}} URLs...{{end}}{{if .HasAvailableSubCommands}}
+  {{.CommandPath}} [command]{{end}}{{if gt (len .Aliases) 0}}
+Aliases:
+  {{.NameAndAliases}}{{end}}{{if .HasExample}}
+Examples:
+{{.Example}}{{end}}{{if .HasAvailableSubCommands}}
+Available Commands:{{range .Commands}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
+  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
+Flags:
+{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasAvailableInheritedFlags}}
+Global Flags:
+{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasHelpSubCommands}}
+Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
+  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
+Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
+`)
+
 	RootCmd.Flags().BoolVarP(&title, "title", "t", false, "Find title attributes")
 	RootCmd.Flags().BoolVarP(&link, "link", "l", false, "Find link attributes")
 	RootCmd.Flags().BoolVarP(&comment, "comment", "c", false, "Find comment attributes")
