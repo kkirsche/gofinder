@@ -25,7 +25,7 @@ func (g *GoFinder) Find(resp *http.Response) error {
 			return c.Err()
 		case html.CommentToken:
 			if g.config.Comments {
-				logrus.Println(fmt.Sprintf("COMMENT FOUND:\t%s", string(c.Text())))
+				logrus.Println(fmt.Sprintf("COMMENT FOUND:\t<!-- %s -->", string(c.Text())))
 			}
 		case html.TextToken:
 			if depth > 0 {
@@ -33,7 +33,7 @@ func (g *GoFinder) Find(resp *http.Response) error {
 				if stxt != "" {
 					if eltype == title {
 						if g.config.Title {
-							logrus.Println(fmt.Sprintf("TITLE FOUND:\t%s", string(c.Text())))
+							logrus.Println(fmt.Sprintf("TITLE FOUND:\t<title>%s</title>", string(c.Text())))
 						}
 					}
 					if eltype == script {

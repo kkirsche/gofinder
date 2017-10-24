@@ -20,7 +20,16 @@ func (g *GoFinder) Get(urlstr string) (*http.Response, error) {
 		parsedURL.Scheme = "http"
 	}
 
-	resp, err := g.client.Get(parsedURL.String())
+	req, err := http.NewRequest("GET", parsedURL.String(), nil)
+	if err != nil {
+		logrus.WithError(err).Errorln("Error occurred creating request")
+		return nil, err
+	}
+
+	// For some reason, people block this type of thing if we don't have a "real" user agent
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+
+	resp, err := g.client.Do(req)
 	if err != nil {
 		logrus.WithError(err).Errorln("Error occurred trying to reach %s", parsedURL.String())
 		return nil, err

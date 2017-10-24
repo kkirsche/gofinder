@@ -23,10 +23,10 @@ import (
 )
 
 var (
-	title   bool
-	link    bool
-	comment bool
-	script  bool
+	te      bool
+	le      bool
+	ce      bool
+	se      bool
 	verbose bool
 )
 
@@ -45,9 +45,11 @@ that are commonly of interest.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if verbose {
 			logrus.SetLevel(logrus.DebugLevel)
+		} else {
+			logrus.SetLevel(logrus.InfoLevel)
 		}
 
-		config := gofinder.NewConfig(title, link, comment, script)
+		config := gofinder.NewConfig(te, le, ce, se)
 		client := gofinder.NewClient(config)
 
 		for _, arg := range args {
@@ -65,7 +67,6 @@ that are commonly of interest.`,
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		logrus.WithError(err).Errorln("Failed to start command")
 		os.Exit(1)
 	}
 }
@@ -91,9 +92,9 @@ Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
 Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
 `)
 
-	RootCmd.Flags().BoolVarP(&title, "title", "t", false, "Find title attributes")
-	RootCmd.Flags().BoolVarP(&link, "link", "l", false, "Find link attributes")
-	RootCmd.Flags().BoolVarP(&comment, "comment", "c", false, "Find comment attributes")
-	RootCmd.Flags().BoolVarP(&script, "script", "s", false, "Find inline and external script attributes")
+	RootCmd.Flags().BoolVarP(&te, "title", "t", false, "Find title attributes")
+	RootCmd.Flags().BoolVarP(&le, "links", "l", false, "Find link attributes")
+	RootCmd.Flags().BoolVarP(&ce, "comments", "c", false, "Find comment attributes")
+	RootCmd.Flags().BoolVarP(&se, "scripts", "s", false, "Find inline and external script attributes")
 	RootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 }
