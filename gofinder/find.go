@@ -17,15 +17,24 @@ func (g *GoFinder) Find(resp *http.Response) error {
 	c := html.NewTokenizer(resp.Body)
 	depth := 0
 	eltype := "unknown"
+	found := false
 
 	for {
 		tt := c.Next()
 		switch tt {
 		case html.ErrorToken:
+			if !found {
+				logrus.WithField("url", resp.Request.URL.String()).Warnln("NO ITEMS FOUND")
+			}
 			return c.Err()
 		case html.CommentToken:
 			if g.config.Comments {
-				logrus.WithField("url", resp.Request.URL.String()).Println(fmt.Sprintf("COMMENT FOUND:\t<!-- %s -->", string(c.Text())))
+				found = true
+				stxt := strings.TrimSpace(string(c.Text()))
+				logrus.WithFields(logrus.Fields{
+					"url":     resp.Request.URL.String(),
+					"comment": stxt,
+				}).Println(fmt.Sprintf("COMMENT FOUND:\t<!-- %s -->", stxt))
 			}
 		case html.TextToken:
 			if depth > 0 {
@@ -33,6 +42,7 @@ func (g *GoFinder) Find(resp *http.Response) error {
 				if stxt != "" {
 					if eltype == title {
 						if g.config.Title {
+							found = true
 							logrus.WithFields(logrus.Fields{
 								"url":   resp.Request.URL.String(),
 								"title": stxt,
@@ -41,6 +51,7 @@ func (g *GoFinder) Find(resp *http.Response) error {
 					}
 					if eltype == script {
 						if g.config.Scripts {
+							found = true
 							logrus.WithFields(logrus.Fields{
 								"url":          resp.Request.URL.String(),
 								"inlineScript": stxt,
@@ -59,6 +70,7 @@ func (g *GoFinder) Find(resp *http.Response) error {
 				if g.config.Links {
 					for _, a := range t.Attr {
 						if a.Key == "href" {
+							found = true
 							logrus.WithFields(logrus.Fields{
 								"url":      resp.Request.URL.String(),
 								"linkHREF": a.Val,
@@ -71,6 +83,7 @@ func (g *GoFinder) Find(resp *http.Response) error {
 				if g.config.Scripts && isScript {
 					for _, a := range t.Attr {
 						if a.Key == "src" {
+							found = true
 							logrus.WithFields(logrus.Fields{
 								"url":            resp.Request.URL.String(),
 								"externalScript": a.Val,
