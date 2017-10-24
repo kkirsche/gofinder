@@ -25,7 +25,7 @@ func (g *GoFinder) Find(resp *http.Response) error {
 			return c.Err()
 		case html.CommentToken:
 			if g.config.Comments {
-				logrus.Println(fmt.Sprintf("COMMENT FOUND:\t<!-- %s -->", string(c.Text())))
+				logrus.WithField("url", resp.Request.URL.String()).Println(fmt.Sprintf("COMMENT FOUND:\t<!-- %s -->", string(c.Text())))
 			}
 		case html.TextToken:
 			if depth > 0 {
@@ -33,12 +33,18 @@ func (g *GoFinder) Find(resp *http.Response) error {
 				if stxt != "" {
 					if eltype == title {
 						if g.config.Title {
-							logrus.Println(fmt.Sprintf("TITLE FOUND:\t<title>%s</title>", string(c.Text())))
+							logrus.WithFields(logrus.Fields{
+								"url":   resp.Request.URL.String(),
+								"title": stxt,
+							}).Println(fmt.Sprintf("TITLE FOUND:\t<title>%s</title>", stxt))
 						}
 					}
 					if eltype == script {
 						if g.config.Scripts {
-							logrus.Println(fmt.Sprintf("INLINE SCRIPT FOUND:\t%s", stxt))
+							logrus.WithFields(logrus.Fields{
+								"url":          resp.Request.URL.String(),
+								"inlineScript": stxt,
+							}).Println(fmt.Sprintf("INLINE SCRIPT FOUND:\t%s", stxt))
 						}
 					}
 				}
@@ -53,7 +59,10 @@ func (g *GoFinder) Find(resp *http.Response) error {
 				if g.config.Links {
 					for _, a := range t.Attr {
 						if a.Key == "href" {
-							logrus.Println(fmt.Sprintf("LINK FOUND:\t%s", a.Val))
+							logrus.WithFields(logrus.Fields{
+								"url":      resp.Request.URL.String(),
+								"linkHREF": a.Val,
+							}).Println(fmt.Sprintf("LINK FOUND:\t%s", a.Val))
 							break
 						}
 					}
@@ -62,7 +71,10 @@ func (g *GoFinder) Find(resp *http.Response) error {
 				if g.config.Scripts && isScript {
 					for _, a := range t.Attr {
 						if a.Key == "src" {
-							logrus.Println(fmt.Sprintf("EXTERNAL SCRIPT FOUND:\t%s", a.Val))
+							logrus.WithFields(logrus.Fields{
+								"url":            resp.Request.URL.String(),
+								"externalScript": a.Val,
+							}).Println(fmt.Sprintf("EXTERNAL SCRIPT FOUND:\t%s", a.Val))
 							break
 						}
 					}
