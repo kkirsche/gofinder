@@ -26,6 +26,7 @@ var (
 	title   bool
 	link    bool
 	comment bool
+	script  bool
 	verbose bool
 )
 
@@ -46,7 +47,7 @@ to quickly create a Cobra application.`,
 			logrus.SetLevel(logrus.DebugLevel)
 		}
 
-		config := gofinder.NewConfig(title, link, comment)
+		config := gofinder.NewConfig(title, link, comment, script)
 		client := gofinder.NewClient(config)
 
 		for _, arg := range args {
@@ -75,5 +76,6 @@ func init() {
 	RootCmd.Flags().BoolVarP(&title, "title", "t", false, "Find title attributes")
 	RootCmd.Flags().BoolVarP(&link, "link", "l", false, "Find link attributes")
 	RootCmd.Flags().BoolVarP(&comment, "comment", "c", false, "Find comment attributes")
+	RootCmd.Flags().BoolVarP(&script, "script", "s", false, "Find inline and external script attributes")
 	RootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 }

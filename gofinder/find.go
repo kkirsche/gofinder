@@ -3,10 +3,14 @@ package gofinder
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/html"
 )
+
+const title = "title"
+const script = "script"
 
 // Find is used to find comment nodes within a page
 func (g *GoFinder) Find(resp *http.Response) error {
@@ -25,36 +29,52 @@ func (g *GoFinder) Find(resp *http.Response) error {
 			}
 		case html.TextToken:
 			if depth > 0 {
-				if eltype == "TITLE" {
-					if g.config.Title {
-						logrus.Println(fmt.Sprintf("TITLE FOUND:\t%s", string(c.Text())))
+				stxt := strings.TrimSpace(string(c.Text()))
+				if stxt != "" {
+					if eltype == title {
+						if g.config.Title {
+							logrus.Println(fmt.Sprintf("TITLE FOUND:\t%s", string(c.Text())))
+						}
+					}
+					if eltype == script {
+						if g.config.Scripts {
+							logrus.Println(fmt.Sprintf("INLINE SCRIPT FOUND:\t%s", stxt))
+						}
 					}
 				}
 			}
 		case html.StartTagToken:
 			t := c.Token()
+			eltype = t.Data
 			isAnchor := t.Data == "a"
-			isTitle := t.Data == "title"
+			isTitle := t.Data == title
+			isScript := t.Data == script
 			if isAnchor {
 				if g.config.Links {
 					for _, a := range t.Attr {
 						if a.Key == "href" {
-							logrus.Debugln("Anchor Found")
 							logrus.Println(fmt.Sprintf("LINK FOUND:\t%s", a.Val))
 							break
 						}
 					}
 				}
-			} else if isTitle {
-				logrus.Debugln("Title Found")
-				eltype = "TITLE"
+			} else if isTitle || isScript {
+				if g.config.Scripts && isScript {
+					for _, a := range t.Attr {
+						if a.Key == "src" {
+							logrus.Println(fmt.Sprintf("EXTERNAL SCRIPT FOUND:\t%s", a.Val))
+							break
+						}
+					}
+				}
 				depth++
 			}
 		case html.EndTagToken:
 			t := c.Token()
 
-			isTitle := t.Data == "title"
-			if isTitle {
+			isTitle := t.Data == title
+			isScript := t.Data == script
+			if isTitle || isScript {
 				depth--
 			}
 		}

@@ -7,10 +7,11 @@ type Config struct {
 	Title    bool
 	Links    bool
 	Comments bool
+	Scripts  bool
 }
 
 // NewConfig creates the structure for us
-func NewConfig(title, link, comment bool) *Config {
+func NewConfig(title, link, comment, script bool) *Config {
 	logrus.WithFields(logrus.Fields{
 		"titleEnabled":   title,
 		"linkEnabled":    link,
@@ -20,5 +21,6 @@ func NewConfig(title, link, comment bool) *Config {
 		Title:    title,
 		Links:    link,
 		Comments: comment,
+		Scripts:  script,
 	}
 }
