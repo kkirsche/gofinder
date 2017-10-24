@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"os"
+	"sync"
 
 	"github.com/kkirsche/gofinder/gofinder"
 	"github.com/sirupsen/logrus"
@@ -53,14 +54,22 @@ that are commonly of interest.`,
 		config := gofinder.NewConfig(ua, te, le, ce, se)
 		client := gofinder.NewClient(config)
 
-		for _, arg := range args {
-			resp, err := client.Get(arg)
-			if err != nil {
-				continue
-			}
+		var wg sync.WaitGroup
 
-			client.Find(resp)
+		for _, arg := range args {
+			wg.Add(1)
+			go func(arg string) {
+				defer wg.Done()
+				resp, err := client.Get(arg)
+				if err != nil {
+					return
+				}
+
+				client.Find(resp)
+			}(arg)
 		}
+
+		wg.Wait()
 	},
 }
 
