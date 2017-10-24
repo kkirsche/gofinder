@@ -27,7 +27,7 @@ func (g *GoFinder) Get(urlstr string) (*http.Response, error) {
 	}
 
 	// For some reason, people block this type of thing if we don't have a "real" user agent
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+	req.Header.Set("User-Agent", g.config.UserAgent)
 
 	resp, err := g.client.Do(req)
 	if err != nil {

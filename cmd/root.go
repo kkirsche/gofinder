@@ -23,6 +23,7 @@ import (
 )
 
 var (
+	ua      string
 	te      bool
 	le      bool
 	ce      bool
@@ -49,7 +50,7 @@ that are commonly of interest.`,
 			logrus.SetLevel(logrus.InfoLevel)
 		}
 
-		config := gofinder.NewConfig(te, le, ce, se)
+		config := gofinder.NewConfig(ua, te, le, ce, se)
 		client := gofinder.NewClient(config)
 
 		for _, arg := range args {
@@ -97,4 +98,5 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	RootCmd.Flags().BoolVarP(&ce, "comments", "c", false, "Find comment attributes")
 	RootCmd.Flags().BoolVarP(&se, "scripts", "s", false, "Find inline and external script attributes")
 	RootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
+	RootCmd.Flags().StringVarP(&ua, "user-agent", "u", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36", "Set the user agent you wish to use")
 }
