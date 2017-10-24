@@ -19,6 +19,11 @@ func (g *GoFinder) Find(resp *http.Response) error {
 	eltype := "unknown"
 	found := false
 
+	if !g.config.Comments || !g.config.Links || !g.config.Scripts || !g.config.Title {
+		found = true
+		logrus.Warnln("Not searching for any items...")
+	}
+
 	for {
 		tt := c.Next()
 		switch tt {
