@@ -21,14 +21,16 @@ func (g *GoFinder) Find(resp *http.Response) error {
 
 	if !g.config.Comments && !g.config.Links && !g.config.Scripts && !g.config.Title {
 		found = true
-		logrus.Warnln("Not searching for any items...")
+		if !g.config.Quiet {
+			logrus.Warnln("Not searching for any items...")
+		}
 	}
 
 	for {
 		tt := c.Next()
 		switch tt {
 		case html.ErrorToken:
-			if !found {
+			if !found && !g.config.Quiet {
 				logrus.WithField("url", resp.Request.URL.String()).Warnln("NO ITEMS FOUND")
 			}
 			return c.Err()

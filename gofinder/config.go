@@ -8,16 +8,18 @@ type Config struct {
 	Links     bool
 	Comments  bool
 	Scripts   bool
+	Quiet     bool
 	UserAgent string
 }
 
 // NewConfig creates the structure for us
-func NewConfig(ua string, te, le, ce, se bool) *Config {
+func NewConfig(ua string, q, te, le, ce, se bool) *Config {
 	logrus.WithFields(logrus.Fields{
 		"userAgent":       ua,
 		"titleEnabled":    te,
 		"linksEnabled":    le,
 		"commentsEnabled": ce,
+		"quietEnabled":    q,
 		"scriptsEnabled":  se,
 	}).Debugln("Building config")
 	return &Config{
@@ -25,6 +27,7 @@ func NewConfig(ua string, te, le, ce, se bool) *Config {
 		Links:     le,
 		Comments:  ce,
 		Scripts:   se,
+		Quiet:     q,
 		UserAgent: ua,
 	}
 }

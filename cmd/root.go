@@ -29,6 +29,7 @@ var (
 	le      bool
 	ce      bool
 	se      bool
+	quiet   bool
 	verbose bool
 )
 
@@ -45,13 +46,16 @@ that are commonly of interest.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		if verbose {
+		if quiet && verbose {
+			logrus.Errorln("Cannot have Verbose and Quiet enabled together")
+			return
+		} else if verbose {
 			logrus.SetLevel(logrus.DebugLevel)
 		} else {
 			logrus.SetLevel(logrus.InfoLevel)
 		}
 
-		config := gofinder.NewConfig(ua, te, le, ce, se)
+		config := gofinder.NewConfig(ua, quiet, te, le, ce, se)
 		client := gofinder.NewClient(config)
 
 		var wg sync.WaitGroup
@@ -106,6 +110,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	RootCmd.Flags().BoolVarP(&le, "links", "l", false, "Find link attributes")
 	RootCmd.Flags().BoolVarP(&ce, "comments", "c", false, "Find comment attributes")
 	RootCmd.Flags().BoolVarP(&se, "scripts", "s", false, "Find inline and external script attributes")
+	RootCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "Only say when you found something")
 	RootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	RootCmd.Flags().StringVarP(&ua, "user-agent", "u", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36", "Set the user agent you wish to use")
 }
