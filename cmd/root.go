@@ -34,12 +34,11 @@ var (
 var RootCmd = &cobra.Command{
 	Use:   "gofinder",
 	Short: "Find portions of a page such as Title, Links or Comments",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `gofinder allows for you to quickly pull out details of a page. This
+includes the page title, link URL's, inline and external scripts, as well as
+comments. The goal of this is to simplify security auditing of sites by being
+able to ignore some of the standard boilerplate nodes and focus on the ones
+that are commonly of interest.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
